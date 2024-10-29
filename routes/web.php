@@ -9,6 +9,7 @@ use App\Http\Controllers\StockController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AttributeController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\CouponController;
 
 
 /*
@@ -109,6 +110,12 @@ Route::middleware(['auth', 'isAdmin'])->group(function () {
     Route::put('/admin/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('admin.updateOrderStatus');
     // Rota para relatório de vendas
     Route::get('/report/sales', [ReportController::class, 'showReport'])->name('report.sales');
+    // Rota para coupons
+    Route::get('/coupons/create', [CouponController::class, 'create'])->name('coupons.create');
+    Route::post('/coupons', [CouponController::class, 'store'])->name('coupons.store');
+    Route::get('/coupons', [CouponController::class, 'index'])->name('coupons.index');
+    Route::delete('/coupons/{id}', [CouponController::class, 'destroy'])->name('coupons.destroy');
+
 
 
 

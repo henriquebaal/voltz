@@ -35,6 +35,8 @@
 
                         <!-- Link "Relatório de Vendas" visível apenas para administradores -->
                         <a class="dropdown-item" href="{{ route('report.sales') }}">Vendas</a>
+                        <!-- Link "Cadastro de Cupons" visível apenas para administradores -->
+                        <a class="dropdown-item" href="{{ route('coupons.index') }}">Marketing</a>
                     @endif
 
                     <!-- Outros itens do submenu "Minha Conta" -->
