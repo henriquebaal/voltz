@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Models\Attribute;
+use App\Models\Coupon;
 
 class CartController extends Controller
 {
@@ -90,4 +91,39 @@ class CartController extends Controller
 
         return redirect()->route('cart.show')->with('error', 'Produto não encontrado no carrinho!');
     }
+
+        // Aplica um cupom de desconto no carrinho
+        public function applyCoupon(Request $request)
+        {
+            $request->validate([
+                'coupon_code' => 'required|string'
+            ]);
+    
+            $coupon = Coupon::where('code', $request->coupon_code)
+                            ->where('valid_until', '>=', now())
+                            ->first();
+    
+            if (!$coupon) {
+                return response()->json(['error' => 'Cupom inválido ou expirado.'], 400);
+            }
+    
+            // Salva o valor do desconto na sessão
+            session(['discount' => $coupon->discount]);
+    
+            // Calcula o total com desconto
+            $cart = session('cart', []);
+            $total = array_reduce($cart, function ($sum, $item) {
+                return $sum + $item['price'] * $item['quantity'];
+            }, 0);
+    
+            $discountedTotal = $total - ($total * $coupon->discount / 100);
+    
+            return response()->json([
+                'success' => 'Cupom aplicado com sucesso!',
+                'discount' => $coupon->discount,
+                'discountedTotal' => $discountedTotal
+            ]);
+        }
+        
+
 }

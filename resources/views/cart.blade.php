@@ -160,6 +160,22 @@
                 <!-- Seção de Pagamento -->
                 <hr>
                 <h5>Método de Pagamento</h5>
+                <hr>
+                <h5>Cupom de Desconto</h5>
+                <form id="applyCouponForm">
+                    @csrf
+                    <div class="input-group mb-3">
+                        <input type="text" name="coupon_code" class="form-control" placeholder="Digite o código do cupom" >
+                        <div class="input-group-append">
+                            <button type="button" class="btn btn-primary" onclick="applyCoupon()">Aplicar Cupom</button>
+                    </div>
+                </div>
+
+                <!-- Mensagens de Sucesso ou Erro do Cupom -->
+                    <div id="couponMessage" class="text-center"></div>
+                </form>
+                <hr>
+                <h5>Método de Pagamento</h5>
                 <form id="paymentForm">
                     @csrf
                     <input type="hidden" name="total" value="{{ $total }}"> <!-- Campo oculto com o valor total -->
@@ -176,7 +192,7 @@
 
                     <!-- Exibir Total do Pedido na Modal -->
                     <div class="alert alert-info text-center">
-                        <h5><strong>Total do Pedido: R$ {{ number_format($total, 2, ',', '.') }}</strong></h5>
+                    <h5><strong>Total do Pedido: <span id="totalComDesconto">R$ {{ number_format($total, 2, ',', '.') }}</span></strong></h5>
                     </div>
 
                     <!-- Centralizar o botão Confirmar Pedido -->
@@ -280,6 +296,38 @@
                 document.getElementById('errorMessage').innerHTML = `
                     <div class="alert alert-danger">Ocorreu um erro ao processar seu pedido. Tente novamente.</div>
                 `;
+            }
+        });
+        
+    }
+    function applyCoupon() {
+        const couponCode = document.querySelector('input[name="coupon_code"]').value.trim();
+
+        // Verifica se o campo do cupom está preenchido
+        if (!couponCode) {
+            document.getElementById('couponMessage').innerHTML = '<div class="alert alert-danger">Por favor, insira um código de cupom.</div>';
+            return;
+        }
+
+        // Envia a requisição para aplicar o cupom
+        axios.post('{{ route("cart.applyCoupon") }}', {
+            coupon_code: couponCode,
+            _token: '{{ csrf_token() }}'
+        })
+        .then(response => {
+            // Exibe a mensagem de sucesso e o desconto aplicado
+            document.getElementById('couponMessage').innerHTML = `<div class="alert alert-success">${response.data.success}</div>`;
+
+            // Atualiza o total com o desconto aplicado
+            const totalComDesconto = response.data.discountedTotal;
+            document.getElementById('totalComDesconto').textContent = `R$ ${totalComDesconto.toFixed(2).replace('.', ',')}`;
+        })
+        .catch(error => {
+            // Exibe a mensagem de erro caso o cupom seja inválido ou expirado
+            if (error.response && error.response.data.error) {
+                document.getElementById('couponMessage').innerHTML = `<div class="alert alert-danger">${error.response.data.error}</div>`;
+            } else {
+                document.getElementById('couponMessage').innerHTML = '<div class="alert alert-danger">Erro ao aplicar o cupom. Tente novamente.</div>';
             }
         });
     }

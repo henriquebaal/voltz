@@ -67,21 +67,24 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         $total = $request->input('total');
-        
+    
+        // Calcula o total se ele não foi enviado
         if (!$total) {
-            // Calcula o total caso ele não tenha sido enviado
             $total = 0;
             foreach (session('cart') as $id => $item) {
                 $total += $item['price'] * $item['quantity'];
             }
         }
     
+        // Aplica o desconto, se houver
+        $discount = session('discount', 0); // Obtém o desconto da sessão (0 se não houver desconto)
+        $total = $total - ($total * $discount / 100);
+    
         // Verifica se há estoque disponível para cada produto
         foreach (session('cart') as $id => $item) {
-            $product = Product::find($id); // Verifica o produto no banco de dados
-            
+            $product = Product::find($id);
+    
             if ($product->stock < $item['quantity']) {
-                // Se não houver estoque suficiente, retorne um erro JSON
                 return response()->json([
                     'message' => 'Estoque insuficiente para o produto ' . $product->name
                 ], 400);
@@ -107,7 +110,7 @@ class OrderController extends Controller
     
             // Reduz o estoque do produto
             $product->stock -= $item['quantity'];
-            $product->save(); // Atualiza o estoque no banco de dados
+            $product->save();
     
             // Cria os itens do pedido
             $orderItem = OrderItem::create([
@@ -120,13 +123,13 @@ class OrderController extends Controller
             // Verifica se o produto tem atributos (ingredientes) selecionados e salva
             if (!empty($item['attributes'])) {
                 foreach ($item['attributes'] as $attribute) {
-                    $orderItem->attributes()->attach($attribute['id']);  // Supondo que exista uma relação `attributes` em `OrderItem`
+                    $orderItem->attributes()->attach($attribute['id']);
                 }
             }
         }
     
-        // Limpa o carrinho após o pedido ser confirmado
-        session()->forget('cart');
+        // Limpa o carrinho e o desconto após o pedido ser confirmado
+        session()->forget(['cart', 'discount']);
     
         // Retorna a resposta JSON com a URL de redirecionamento
         return response()->json([
@@ -134,6 +137,7 @@ class OrderController extends Controller
             'redirect_url' => route('orders.summary', ['order' => $order->id])
         ]);
     }
+    
     
     
     
