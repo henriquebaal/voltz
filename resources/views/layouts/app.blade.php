@@ -138,6 +138,39 @@
             font-family: 'RedHatDisplay', sans-serif;
         }
 
+        @media (max-width: 768px) {
+            .table tbody, .table thead {
+             display: block;
+            }
+
+        .table thead {
+             display: none; /* Esconde o cabeçalho em telas pequenas */
+            }
+
+        .table tbody tr {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 1em;
+            border: 1px solid #dee2e6;
+            padding: 0.5em;
+            }
+
+        .table tbody td {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5em 0;
+            border: none;
+            }
+
+        .table tbody td::before {
+            content: attr(data-label);
+            font-weight: bold;
+            text-transform: capitalize;
+            width: 50%;
+            }
+}
+
+
     </style>
 
     @yield('styles')

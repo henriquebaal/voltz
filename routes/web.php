@@ -93,6 +93,8 @@ Route::post('/account/update-password', [UserController::class, 'updatePassword'
 Route::post('/user/updateAddressPhone', [UserController::class, 'updateAddressPhone'])->name('user.updateAddressPhone');
 // Programa de pontos
 Route::post('/account/redeem-loyalty-coupon', [UserController::class, 'redeemLoyaltyCoupon'])->name('account.redeemLoyaltyCoupon');
+// Tela de avaliações
+Route::get('/reviews/report', [OrderController::class, 'reviewReport'])->name('reviews.report');
 
 
 });

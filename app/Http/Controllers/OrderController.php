@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\User;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\Coupon;
@@ -198,18 +199,21 @@ class OrderController extends Controller
         return view('orders.user_orders', compact('orders', 'sortOrder'));
     }
     
-public function rate(Request $request, Order $order)
-{
-    $request->validate([
-        'rating' => 'required|integer|min:1|max:5',
-    ]);
-
-    // Salvar a avaliação
-    $order->rating = $request->input('rating');
-    $order->save();
-
-    return redirect()->back()->with('success', 'Avaliação enviada com sucesso!');
-}
+    public function rate(Request $request, Order $order)
+    {
+        $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+            'review_comment' => 'nullable|string|max:500', // Validação para o campo de comentário
+        ]);
+    
+        // Salvar a avaliação e o comentário
+        $order->rating = $request->input('rating');
+        $order->review_comment = $request->input('review_comment'); // Salva o comentário se presente
+        $order->save();
+    
+        return redirect()->back()->with('success', 'Avaliação enviada com sucesso!');
+    }
+    
 public function updateStatus(Request $request, Order $order)
 {
     $request->validate([
@@ -227,6 +231,32 @@ public function updateStatus(Request $request, Order $order)
 
     return redirect()->back()->with('success', 'Status do pedido atualizado com sucesso!');
 }
+public function reviewReport(Request $request)
+{
+    // Filtrar por cliente e estrelas, se fornecidos
+    $query = Order::query()->whereNotNull('rating');
+
+    if ($request->filled('customer_id')) {
+        $query->where('user_id', $request->customer_id);
+    }
+
+    if ($request->filled('stars')) {
+        $query->where('rating', $request->stars);
+    }
+
+    // Aplicar a ordenação por data
+    $sortOrder = $request->input('sort_order', 'desc'); // Padrão para mais recente
+    $query->orderBy('created_at', $sortOrder);
+
+    // Obter as avaliações com informações do cliente
+    $reviews = $query->with('user')->get();
+
+    // Obter todos os clientes para o filtro
+    $customers = User::all();
+
+    return view('reviews.report', compact('reviews', 'customers', 'sortOrder'));
+}
+
 
 
 

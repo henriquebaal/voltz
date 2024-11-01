@@ -66,6 +66,7 @@
                             </ul>
 
                             <!-- Exibir o formulário de avaliação apenas se o status for "entregue" -->
+                            <hr>
                             @if($order->status === 'Entregue')
                                 @if(!$order->rating)
                                     <hr>
@@ -83,10 +84,15 @@
                                                 @endfor
                                             </div>
                                         </div>
+                                        <div class="form-group">
+                                            <label for="review_comment">Comentário:</label>
+                                            <textarea name="review_comment" id="review_comment" class="form-control" rows="3" placeholder="Deixe seu comentário sobre o pedido"></textarea>
+                                        </div>
                                         <button type="submit" class="btn btn-success">Enviar Avaliação</button>
                                     </form>
                                 @else
                                     <p><strong>Avaliação:</strong> {{ $order->rating }} estrelas</p>
+                                    <p><strong>Comentário:</strong> {{ $order->review_comment }}</p>
                                 @endif
                             @else
                                 <p><em>Avaliação disponível apenas após a entrega do pedido.</em></p>
