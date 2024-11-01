@@ -10,7 +10,11 @@ class Coupon extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['code', 'discount', 'valid_from', 'valid_until'];
+    protected $fillable = ['code','is_unique', 'discount', 'valid_from', 'valid_until'];
+
+    protected $casts = [
+        'is_unique' => 'boolean', // Define 'is_unique' como booleano para garantir a consistência
+    ];
 
     /**
      * Converte o campo valid_from para Carbon se for string.

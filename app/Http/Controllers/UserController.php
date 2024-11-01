@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Coupon;
 
 class UserController extends Controller
 {
@@ -123,7 +124,49 @@ class UserController extends Controller
     public function edit()
     {
         $user = Auth::user();
-        return view('account', compact('user'));
+        return $this->showAccount();
     }
 
+
+    public function redeemLoyaltyCoupon()
+    {
+        $user = Auth::user();
+    
+        if ($user->totalLoyaltyPoints() >= 100) {
+            // Gera um código de cupom aleatório que começa com "50OFF"
+            $randomCode = '50OFF' . strtoupper(substr(bin2hex(random_bytes(3)), 0, 6));
+    
+            // Cria o cupom e define como único (is_unique = true)
+            $coupon = Coupon::create([
+                'code' => $randomCode,
+                'discount' => 50,
+                'valid_until' => now()->addMonth(),
+                'user_id' => $user->id,
+                'is_unique' => true,  // Define o cupom como único
+            ]);
+    
+            // Retorna o código do cupom gerado na resposta
+            return response()->json([
+                'message' => 'Cupom de 50% resgatado com sucesso!',
+                'coupon_code' => $coupon->code
+            ]);
+        }
+    
+        // Caso o usuário não tenha pontos suficientes
+        return response()->json(['error' => 'Você não tem pontos suficientes para resgatar um cupom.'], 400);
+    }
+    
+
+    public function showAccount()
+    {
+        $user = Auth::user();
+
+        // Calcula os pontos de fidelidade do usuário
+        $loyaltyPoints = $user->totalLoyaltyPoints(); // Corrigido o nome do método
+
+        return view('account', [
+            'user' => $user,
+            'loyaltyPoints' => $loyaltyPoints
+        ]);
+    }
 }

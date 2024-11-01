@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -42,4 +41,22 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    // Relacionamento com 'orders'
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    // Relacionamento com pontos de fidelidade
+    public function loyaltyPoints()
+    {
+        return $this->hasMany(LoyaltyPoint::class);
+    }
+
+    // Método para obter o total de pontos de fidelidade acumulados
+    public function totalLoyaltyPoints()
+    {
+        return $this->loyaltyPoints()->sum('points');
+    }
 }

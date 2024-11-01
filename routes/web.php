@@ -12,6 +12,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\CouponController;
 
 
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -79,7 +80,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/orders', [OrderController::class, 'userOrders'])->name('orders.user')->middleware('auth');
 
 // Rota para a página "Minha Conta"
-Route::get('/account', [UserController::class, 'edit'])->name('account.edit')->middleware('auth');
+Route::get('/account', [UserController::class, 'showAccount'])->name('account.show');
+
 
 // Rota para processar a atualização dos dados
 Route::post('/account/update-profile', [UserController::class, 'updateProfile'])->name('account.updateProfile')->middleware('auth');
@@ -89,6 +91,9 @@ Route::post('/account/update-profile', [UserController::class, 'updateProfile'])
 Route::post('/account/update-password', [UserController::class, 'updatePassword'])->name('account.updatePassword')->middleware('auth');
 
 Route::post('/user/updateAddressPhone', [UserController::class, 'updateAddressPhone'])->name('user.updateAddressPhone');
+// Programa de pontos
+Route::post('/account/redeem-loyalty-coupon', [UserController::class, 'redeemLoyaltyCoupon'])->name('account.redeemLoyaltyCoupon');
+
 
 });
 

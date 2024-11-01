@@ -14,7 +14,7 @@
                     Minha Conta
                 </a>
                 <div class="dropdown-menu" aria-labelledby="accountDropdown">
-                    <a class="dropdown-item" href="{{ route('account.edit') }}">Perfil</a>
+                    <a class="dropdown-item" href="{{ route('account.show') }}">Perfil</a>
 
                     <!-- Link "Dashboard" visível apenas para administradores -->
                     @if(Auth::user() && Auth::user()->is_admin)

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\Coupon;
+use App\Models\LoyaltyPoint;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -67,7 +69,7 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         $total = $request->input('total');
-    
+        
         // Calcula o total se ele não foi enviado
         if (!$total) {
             $total = 0;
@@ -128,8 +130,33 @@ class OrderController extends Controller
             }
         }
     
-        // Limpa o carrinho e o desconto após o pedido ser confirmado
-        session()->forget(['cart', 'discount']);
+        // Calcula os pontos de fidelidade com base no total final do pedido (1 ponto a cada 10 reais)
+        $points = floor($total / 10);
+    
+        // Armazena os pontos na tabela de pontos de fidelidade
+        LoyaltyPoint::create([
+            'user_id' => Auth::id(),
+            'points' => $points,
+            'order_id' => $order->id,
+        ]);
+    
+        // Verifica se há um cupom aplicado e se ele é único, então o remove
+        $couponCode = session('coupon_code'); // Certifique-se de que o código do cupom está salvo na sessão
+        if ($couponCode) {
+            $coupon = Coupon::where('code', $couponCode)->first();
+    
+            if ($coupon && $coupon->is_unique) {
+                $coupon->delete(); // Remove o cupom se for único
+                \Log::info("Cupom {$couponCode} deletado com sucesso."); // Confirmação no log
+            } else {
+                \Log::warning("Cupom {$couponCode} não foi deletado. Código não encontrado ou não é único.");
+            }
+        } else {
+            \Log::warning("Nenhum código de cupom encontrado na sessão.");
+        }
+    
+        // Limpa o carrinho, o desconto e o cupom após o pedido ser confirmado
+        session()->forget(['cart', 'discount', 'coupon_code']);
     
         // Retorna a resposta JSON com a URL de redirecionamento
         return response()->json([
@@ -137,6 +164,7 @@ class OrderController extends Controller
             'redirect_url' => route('orders.summary', ['order' => $order->id])
         ]);
     }
+    
     
     
     

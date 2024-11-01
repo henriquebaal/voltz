@@ -4,7 +4,7 @@
 <div class="container mt-5">
     <h1 class="text-center mb-5">Minha Conta</h1>
 
-    <!-- Mensagem de sucesso -->
+    <!-- Mensagem de sucesso e erro -->
     <div id="successMessage" class="alert alert-success d-none"></div>
     <div id="errorMessage" class="alert alert-danger d-none"></div>
 
@@ -97,26 +97,62 @@
                 </div>
             </div>
         </div>
+
+        <!-- Exibir pontos de fidelidade na seção "Minha Conta" -->
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Programa de Fidelidade</h5>
+                </div>
+                <div class="card-body">
+                    <p>Você tem <strong>{{ $user->totalLoyaltyPoints() }}</strong> pontos.</p>
+                    
+                    <!-- Exibir botão se o usuário tiver 100 pontos ou mais -->
+                    @if ($user->totalLoyaltyPoints() >= 100)
+                        <button id="redeemCouponButton" class="btn btn-success" onclick="redeemCoupon()">Resgatar Cupom de 50% de Desconto</button>
+                    @else
+                        <p>Acumule 100 pontos para resgatar um cupom de 50% de desconto.</p>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para exibir o cupom resgatado -->
+<div class="modal fade" id="couponModal" tabindex="-1" role="dialog" aria-labelledby="couponModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="couponModalLabel">Cupom Resgatado!</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Código do Cupom:</strong> <span id="couponCode"></span></p>
+                <p>Instrução: Use o código acima ao finalizar a compra para obter um desconto de 50%!</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+            </div>
+        </div>
     </div>
 </div>
 
 <!-- Axios Script -->
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
-    // Função para atualizar os dados pessoais do usuário usando Axios
     function updateProfile() {
-        // Obtém os dados do formulário
         const formData = new FormData(document.getElementById('updateProfileForm'));
 
         axios.post("{{ route('account.updateProfile') }}", formData)
             .then(response => {
-                // Exibe mensagem de sucesso
                 document.getElementById('successMessage').innerHTML = response.data.message;
                 document.getElementById('successMessage').classList.remove('d-none');
                 document.getElementById('errorMessage').classList.add('d-none');
             })
             .catch(error => {
-                // Exibe mensagem de erro, caso existam erros de validação
                 let errorMessage = '';
                 if (error.response && error.response.data.errors) {
                     const errors = error.response.data.errors;
@@ -133,6 +169,24 @@
                 document.getElementById('errorMessage').classList.remove('d-none');
                 document.getElementById('successMessage').classList.add('d-none');
             });
+    }
+
+    function redeemCoupon() {
+        axios.post("{{ route('account.redeemLoyaltyCoupon') }}", {
+            _token: '{{ csrf_token() }}'
+        })
+        .then(response => {
+            document.getElementById('couponCode').textContent = response.data.coupon_code;
+            $('#couponModal').modal('show'); // Exibir a modal com o cupom
+        })
+        .catch(error => {
+            const errorMessage = error.response && error.response.data.error
+                ? error.response.data.error
+                : 'Ocorreu um erro ao resgatar o cupom.';
+            document.getElementById('errorMessage').innerHTML = errorMessage;
+            document.getElementById('errorMessage').classList.remove('d-none');
+            document.getElementById('successMessage').classList.add('d-none');
+        });
     }
 </script>
 @endsection

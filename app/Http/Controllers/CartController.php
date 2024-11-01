@@ -107,8 +107,9 @@ class CartController extends Controller
                 return response()->json(['error' => 'Cupom inválido ou expirado.'], 400);
             }
     
-            // Salva o valor do desconto na sessão
-            session(['discount' => $coupon->discount]);
+            // Salva o valor do desconto e o código do cupom na sessão
+            session(['discount' => $coupon->discount, 'coupon_code' => $coupon->code]);
+
     
             // Calcula o total com desconto
             $cart = session('cart', []);
