@@ -12,6 +12,22 @@
 
     <!-- Estilos personalizados -->
     <style>
+/* Estilos para dispositivos móveis */
+@media (max-width: 767.98px) {
+    .dropdown-menu {
+        position: static;
+        width: 100%;
+        padding: 0;
+        margin: 0;
+        border: none;
+        box-shadow: none;
+    }
+    .dropdown-submenu .dropdown-menu {
+        display: none;
+        padding: 0;
+    }
+}
+
         /* Configuração da Navbar */
         .navbar {
             margin-bottom: 0;

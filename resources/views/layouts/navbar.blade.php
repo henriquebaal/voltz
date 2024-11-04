@@ -16,10 +16,6 @@
                 <div class="dropdown-menu" aria-labelledby="accountDropdown">
                     <a class="dropdown-item" href="{{ route('account.show') }}">Perfil</a>
 
-                    <!-- Link "Dashboard" visível apenas para administradores -->
-                    @if(Auth::user() && Auth::user()->is_admin)
-                        <a class="dropdown-item" href="{{ route('admin.dashboard') }}">Dashboard</a>
-                    @endif
 
                     <!-- Submenu "Estoque" visível apenas para administradores -->
                     @if(Auth::user() && Auth::user()->is_admin)
@@ -34,9 +30,23 @@
                         </div>
 
                         <!-- Link "Relatório de Vendas" visível apenas para administradores -->
-                        <a class="dropdown-item" href="{{ route('report.sales') }}">Vendas</a>
+                        <div class="dropdown-submenu">
+                            <a class="dropdown-item dropdown-toggle" href="#">Gerência</a>
+                            <div class="dropdown-menu dropdown-left">
+                                <a class="dropdown-item" href="{{ route('report.sales') }}">Vendas</a>
+                                <a class="dropdown-item" href="{{ route('reviews.report') }}">Avaliações</a>
+                                <a class="dropdown-item" href="{{ route('admin.dashboard') }}">Painel</a>
+                            </div>
+                        </div>
+
                         <!-- Link "Cadastro de Cupons" visível apenas para administradores -->
-                        <a class="dropdown-item" href="{{ route('coupons.index') }}">Marketing</a>
+                        <div class="dropdown-submenu">
+                            <a class="dropdown-item dropdown-toggle" href="#">Marketing</a>
+                            <div class="dropdown-menu dropdown-left">
+                                <a class="dropdown-item" href="{{ route('coupons.index') }}">Cupons</a>
+                                <a class="dropdown-item" href="{{ route('reviews.report') }}">Avaliações</a>
+                            </div>
+                        </div>
                     @endif
 
                     <!-- Outros itens do submenu "Minha Conta" -->
@@ -56,3 +66,21 @@
         </ul>
     </div>
 </nav>
+<!-- Script para controlar submenus no mobile -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Abre e fecha o submenu ao clicar no item de menu no mobile
+        $('.dropdown-submenu > a').on("click", function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            $(this).next('.dropdown-menu').slideToggle();
+        });
+
+        // Fecha qualquer submenu ao clicar em outro item fora do submenu
+        $('.dropdown').on("hide.bs.dropdown", function() {
+            $('.dropdown-menu .dropdown-menu').hide();
+        });
+    });
+</script>
+
