@@ -10,6 +10,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AttributeController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\CouponController;
+use App\Http\Controllers\EmployeeController;
 
 
 
@@ -63,8 +64,6 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
     Route::post('/cart/apply-coupon', [CartController::class, 'applyCoupon'])->name('cart.applyCoupon');
 
-
-
     // Rota de logout para deslogar o usuário autenticado
     Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 
@@ -74,35 +73,33 @@ Route::middleware(['auth'])->group(function () {
     // Rota para salvar o pedido e redirecionar para a tela de resumo
     Route::post('/orders/store', [OrderController::class, 'store'])->name('orders.store');
 
-// Rota para exibir o resumo do pedido
+    // Rota para exibir o resumo do pedido
     Route::get('/orders/summary/{order}', [OrderController::class, 'showSummary'])->name('orders.summary');
-// Rota para acompanhamento de pedidos
+    // Rota para acompanhamento de pedidos
     Route::get('/orders', [OrderController::class, 'userOrders'])->name('orders.user')->middleware('auth');
 
-// Rota para a página "Minha Conta"
-Route::get('/account', [UserController::class, 'showAccount'])->name('account.show');
+    // Rota para a página "Minha Conta"
+    Route::get('/account', [UserController::class, 'showAccount'])->name('account.show');
 
+    // Rota para processar a atualização dos dados
+    Route::post('/account/update-profile', [UserController::class, 'updateProfile'])->name('account.updateProfile')->middleware('auth');
+    // Rota para processar a atualização da senha
+    Route::post('/account/update-password', [UserController::class, 'updatePassword'])->name('account.updatePassword')->middleware('auth');
 
-// Rota para processar a atualização dos dados
-Route::post('/account/update-profile', [UserController::class, 'updateProfile'])->name('account.updateProfile')->middleware('auth');
-
-
-// Rota para processar a atualização da senha
-Route::post('/account/update-password', [UserController::class, 'updatePassword'])->name('account.updatePassword')->middleware('auth');
-
-Route::post('/user/updateAddressPhone', [UserController::class, 'updateAddressPhone'])->name('user.updateAddressPhone');
-// Programa de pontos
-Route::post('/account/redeem-loyalty-coupon', [UserController::class, 'redeemLoyaltyCoupon'])->name('account.redeemLoyaltyCoupon');
-// Tela de avaliações
-Route::get('/reviews/report', [OrderController::class, 'reviewReport'])->name('reviews.report');
-
+    Route::post('/user/updateAddressPhone', [UserController::class, 'updateAddressPhone'])->name('user.updateAddressPhone');
+    // Programa de pontos
+    Route::post('/account/redeem-loyalty-coupon', [UserController::class, 'redeemLoyaltyCoupon'])->name('account.redeemLoyaltyCoupon');
+    // Tela de avaliações
+    Route::get('/reviews/report', [OrderController::class, 'reviewReport'])->name('reviews.report');
+    // Rota avaliações
+    Route::post('/orders/{order}/rate', [OrderController::class, 'rate'])->name('orders.rate');
 
 });
 
 // Rotas protegidas com middleware `auth` e `isAdmin` (acessíveis apenas por administradores)
 Route::middleware(['auth', 'isAdmin'])->group(function () {
     Route::get('/admin', [AdminController::class, 'index'])->name('admin.dashboard');
-// Rotas para o gerenciamento de estoque
+    // Rotas para o gerenciamento de estoque
     Route::get('/stock', [StockController::class, 'index'])->name('stock.index');
     Route::post('/stock/add/{product}', [StockController::class, 'addStock'])->name('stock.add');
     Route::post('/stock/remove/{product}', [StockController::class, 'removeStock'])->name('stock.remove');
@@ -112,8 +109,6 @@ Route::middleware(['auth', 'isAdmin'])->group(function () {
     // Rotas para atributos
     Route::get('/attributes/create', [AttributeController::class, 'create'])->name('attributes.create');
     Route::post('/attributes', [AttributeController::class, 'store'])->name('attributes.store');
-    // Rota avaliações
-    Route::post('/orders/{order}/rate', [OrderController::class, 'rate'])->name('orders.rate');
     // Rota Atualiza status
     Route::put('/admin/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('admin.updateOrderStatus');
     // Rota para relatório de vendas
@@ -123,6 +118,25 @@ Route::middleware(['auth', 'isAdmin'])->group(function () {
     Route::post('/coupons', [CouponController::class, 'store'])->name('coupons.store');
     Route::get('/coupons', [CouponController::class, 'index'])->name('coupons.index');
     Route::delete('/coupons/{id}', [CouponController::class, 'destroy'])->name('coupons.destroy');
+    // Rota cadastro de empregados
+    Route::resource('employees', EmployeeController::class);
+    // Listar funcionários
+     Route::get('/employees', [EmployeeController::class, 'index'])->name('employees.index');
+    
+    // Formulário para criar um novo funcionário
+     Route::get('employees/create', [EmployeeController::class, 'create'])->name('employees.create');
+ 
+    // Armazenar um novo funcionário
+    Route::post('/employees', [EmployeeController::class, 'store'])->name('employees.store');
+ 
+    // Formulário para editar um funcionário
+    Route::get('/{employee}/edit', [EmployeeController::class, 'edit'])->name('employees.edit');
+ 
+    // Atualizar os dados do funcionário
+    Route::put('/{employee}', [EmployeeController::class, 'update'])->name('employees.update');
+ 
+    // Remover um funcionário
+     Route::delete('/{employee}', [EmployeeController::class, 'destroy'])->name('employees.destroy');
 
 
 

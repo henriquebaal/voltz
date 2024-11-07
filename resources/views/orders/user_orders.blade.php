@@ -3,6 +3,15 @@
 @section('content')
 <div class="container mt-5">
     <h1 class="text-center mb-5">Meus Pedidos</h1>
+       <!-- Botão de contato via WhatsApp -->
+       <div class="text-center mt-4">
+        <a href="https://wa.me/5541999999999?text=Problema%20com%20o%20atendimento%3F%20Entre%20em%20contato%20conosco."
+           class="btn btn-success" 
+           target="_blank" 
+           style="background-color: #25D366; border-color: #25D366;">
+            <i class="fab fa-whatsapp"></i> Problema com o pedido? Entre em contato conosco.
+        </a>
+    </div>
 
     <!-- Filtro para ordenar por data -->
     <div class="row mb-4">
@@ -107,5 +116,7 @@
     <div class="text-center mt-5">
         <a href="{{ route('home') }}" class="btn btn-primary">Voltar ao Cardápio</a>
     </div>
+
+ 
 </div>
 @endsection

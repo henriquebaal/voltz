@@ -36,6 +36,7 @@
                                 <a class="dropdown-item" href="{{ route('report.sales') }}">Vendas</a>
                                 <a class="dropdown-item" href="{{ route('reviews.report') }}">Avaliações</a>
                                 <a class="dropdown-item" href="{{ route('admin.dashboard') }}">Painel</a>
+                                <a class="dropdown-item" href="{{ route('employees.index') }}">Funcionários</a>
                             </div>
                         </div>
 
