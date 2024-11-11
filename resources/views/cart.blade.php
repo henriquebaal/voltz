@@ -4,6 +4,7 @@
 <div class="container mt-5">
     <h1 class="text-center mb-5">Carrinho de Compras</h1>
 
+
     @if(session('cart') && count(session('cart')) > 0)
         <table class="table table-bordered">
             <thead>
@@ -110,22 +111,32 @@
 
                 <!-- Exibir os produtos e atributos selecionados -->
                 <h5>Itens do Pedido:</h5>
-                <ul class="list-group">
-                    @foreach(session('cart') as $item)
-                        <li class="list-group-item">
-                            {{ $item['name'] }} - Quantidade: {{ $item['quantity'] }}
-                            <ul>
-                                @if(!empty($item['attributes']) && count($item['attributes']) > 0)
-                                    @foreach($item['attributes'] as $attribute)
-                                        <li>{{ $attribute->name }}</li>
-                                    @endforeach
-                                @else
-                                    <li><em>Nenhum atributo selecionado</em></li>
-                                @endif
-                            </ul>
-                        </li>
-                    @endforeach
-                </ul>
+
+                @php
+                    $cart = session('cart', []);
+                @endphp
+
+                @if(!empty($cart) && count($cart) > 0)
+                    <ul class="list-group">
+                        @foreach($cart as $item)
+                            <li class="list-group-item">
+                                {{ $item['name'] }} - Quantidade: {{ $item['quantity'] }}
+                                <ul>
+                                    @if(!empty($item['attributes']) && count($item['attributes']) > 0)
+                                        @foreach($item['attributes'] as $attribute)
+                                            <li>{{ $attribute->name }}</li>
+                                        @endforeach
+                                    @else
+                                        <li><em>Nenhum atributo selecionado</em></li>
+                                    @endif
+                                </ul>
+                            </li>
+                        @endforeach
+                    </ul>
+                @else
+                    <p class="text-center">Seu carrinho está vazio!</p>
+                @endif
+
                             
                 <!-- Formulário para Editar Endereço e Telefone -->
                 <form id="updateUserDataForm">
