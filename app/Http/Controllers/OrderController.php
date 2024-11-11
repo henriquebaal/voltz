@@ -214,23 +214,31 @@ class OrderController extends Controller
         return redirect()->back()->with('success', 'Avaliação enviada com sucesso!');
     }
     
-public function updateStatus(Request $request, Order $order)
-{
-    $request->validate([
-        'status' => 'required|in:Pendente,Em preparo,Saiu para entrega,Entregue',
-    ]);
-
-    // Atualiza o status do pedido
-    $order->status = $request->input('status');
-    $order->save();
-
-    // Notificar o usuário sobre a atualização do status
-    if ($order->user) {
-        $order->user->notify(new \App\Notifications\OrderStatusUpdated($order));
+    public function updateStatus(Request $request, Order $order)
+    {
+        // Validação do status enviado
+        $request->validate([
+            'status' => 'required|in:Pendente,Em preparo,Saiu para entrega,Entregue',
+        ]);
+    
+        // Atualiza o status do pedido
+        $order->status = $request->input('status');
+        $order->save();
+    
+        // Notificar o usuário sobre a atualização do status
+        if ($order->user) {
+            $order->user->notify(new \App\Notifications\OrderStatusUpdated($order));
+        }
+    
+        // Retorna resposta JSON se a requisição for AJAX
+        if ($request->ajax()) {
+            return response()->json(['message' => 'Status do pedido atualizado com sucesso!']);
+        }
+    
+        // Redireciona de volta com uma mensagem de sucesso caso não seja uma requisição AJAX
+        return redirect()->back()->with('success', 'Status do pedido atualizado com sucesso!');
     }
-
-    return redirect()->back()->with('success', 'Status do pedido atualizado com sucesso!');
-}
+    
 public function reviewReport(Request $request)
 {
     // Filtrar por cliente e estrelas, se fornecidos

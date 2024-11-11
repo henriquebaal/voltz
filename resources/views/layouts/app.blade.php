@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
     <link rel="icon" href="{{ asset('simbolo.png') }}" type="image/png"/>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Hamburgueria')</title>
@@ -22,11 +23,34 @@
         border: none;
         box-shadow: none;
     }
+    
+    .dropdown-submenu {
+        position: relative;
+    }
+
+    /* Configuração para abrir o submenu à direita */
     .dropdown-submenu .dropdown-menu {
+        position: absolute;
+        top: 0;
+        left: 100%; /* Abre à direita do item pai */
         display: none;
-        padding: 0;
+        min-width: 180px;
+        padding: 0.5rem;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        z-index: 1000;
+    }
+
+    /* Exibir o submenu ao passar o mouse ou ao abrir no mobile */
+    .dropdown-submenu:hover > .dropdown-menu,
+    .dropdown-submenu:focus > .dropdown-menu,
+    .dropdown-submenu > .dropdown-menu.show {
+        display: block;
     }
 }
+
+
 
         /* Configuração da Navbar */
         .navbar {
@@ -211,7 +235,7 @@
     </div>
 
     <!-- Scripts do Bootstrap e JQuery -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>

@@ -110,7 +110,7 @@ Route::middleware(['auth', 'isAdmin'])->group(function () {
     Route::get('/attributes/create', [AttributeController::class, 'create'])->name('attributes.create');
     Route::post('/attributes', [AttributeController::class, 'store'])->name('attributes.store');
     // Rota Atualiza status
-    Route::put('/admin/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('admin.updateOrderStatus');
+    Route::post('/admin/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('admin.updateOrderStatus');
     // Rota para relatório de vendas
     Route::get('/report/sales', [ReportController::class, 'showReport'])->name('report.sales');
     // Rota para coupons
@@ -118,25 +118,16 @@ Route::middleware(['auth', 'isAdmin'])->group(function () {
     Route::post('/coupons', [CouponController::class, 'store'])->name('coupons.store');
     Route::get('/coupons', [CouponController::class, 'index'])->name('coupons.index');
     Route::delete('/coupons/{id}', [CouponController::class, 'destroy'])->name('coupons.destroy');
-    // Rota cadastro de empregados
-    Route::resource('employees', EmployeeController::class);
-    // Listar funcionários
-     Route::get('/employees', [EmployeeController::class, 'index'])->name('employees.index');
-    
-    // Formulário para criar um novo funcionário
-     Route::get('employees/create', [EmployeeController::class, 'create'])->name('employees.create');
- 
-    // Armazenar um novo funcionário
-    Route::post('/employees', [EmployeeController::class, 'store'])->name('employees.store');
- 
-    // Formulário para editar um funcionário
+// Rotas para gerenciamento de funcionários com prefixo employees
+Route::prefix('employees')->group(function () {
+    Route::get('/', [EmployeeController::class, 'index'])->name('employees.index');
+    Route::get('/create', [EmployeeController::class, 'create'])->name('employees.create');
+    Route::post('/', [EmployeeController::class, 'store'])->name('employees.store');
     Route::get('/{employee}/edit', [EmployeeController::class, 'edit'])->name('employees.edit');
- 
-    // Atualizar os dados do funcionário
     Route::put('/{employee}', [EmployeeController::class, 'update'])->name('employees.update');
- 
-    // Remover um funcionário
-     Route::delete('/{employee}', [EmployeeController::class, 'destroy'])->name('employees.destroy');
+    Route::delete('/{employee}', [EmployeeController::class, 'destroy'])->name('employees.destroy');
+});
+
 
 
 

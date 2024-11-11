@@ -41,13 +41,12 @@
                         <ul class="list-group">
                             @foreach($recentOrders as $order)
                                 <li class="list-group-item">
-                                    <!-- Exibindo o número do pedido e o nome do cliente -->
                                     Pedido #{{ $order->order_number }} - Feito por {{ $order->user->name }} - {{ $order->created_at->format('d/m/Y H:i') }}
 
                                     <!-- Formulário para atualizar o status -->
-                                    <form action="{{ route('admin.updateOrderStatus', $order->id) }}" method="POST" class="mt-2">
+                                    <form class="update-status-form mt-2" data-order-id="{{ $order->id }}">
                                         @csrf
-                                        @method('PUT')
+                                        
 
                                         <div class="form-group">
                                             <label for="status">Status:</label>
@@ -64,10 +63,8 @@
                             @endforeach
                         </ul>
 
-                        <!-- Links de paginação para pedidos recentes -->
                         <div class="mt-3 d-flex justify-content-center">
-                        {{ $recentOrders->links('pagination::bootstrap-4') }}
-
+                            {{ $recentOrders->links('pagination::bootstrap-4') }}
                         </div>
                     @else
                         <p>Nenhum pedido recente.</p>
@@ -77,4 +74,84 @@
         </div>
     </div>
 </div>
+
+<!-- Modal de Atualização -->
+<div class="modal fade" id="statusModal" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="statusModalLabel">Atualizando status...</h5>
+            </div>
+            <div class="modal-body">
+                Aguarde enquanto o status está sendo atualizado.
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Sucesso -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="successModalLabel">Sucesso</h5>
+            </div>
+            <div class="modal-body">
+                Status atualizado com sucesso!
+            </div>
+        </div>
+    </div>
+</div>
+
+@endsection
+
+@section('scripts')
+<script>
+$(document).ready(function() {
+    $('.update-status-form').on('submit', function(e) {
+        e.preventDefault();
+
+        let form = $(this);
+        let orderId = form.data('order-id');
+        let status = form.find('select[name="status"]').val();
+
+        // Abrir a modal de atualização
+        $('#statusModal').modal('show');
+        $('#statusModalLabel').text('Atualizando status...');
+        $('.modal-body').text('Aguarde enquanto o status está sendo atualizado.');
+
+        // Enviar a requisição com axios.post
+        axios.post(`/admin/orders/${orderId}/status`, {
+            status: status
+        }, {
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        })
+        .then(function(response) {
+            console.log('Resposta do servidor:', response.data.message);
+
+            $('#statusModalLabel').text('Sucesso');
+            $('.modal-body').text('Status atualizado com sucesso!');
+
+            setTimeout(function() {
+                $('#statusModal').modal('hide');
+                location.reload();
+            }, 2000);
+        })
+        .catch(function(error) {
+            console.error('Erro ao atualizar o status:', error.response || error);
+            $('.modal-body').text('Erro ao atualizar o status. Tente novamente.');
+
+            $('#statusModalLabel').text('Erro');
+
+            setTimeout(function() {
+                $('#statusModal').modal('hide');
+            }, 2000);
+        });
+    });
+});
+
+
+</script>
 @endsection

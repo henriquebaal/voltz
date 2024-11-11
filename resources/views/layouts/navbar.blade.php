@@ -70,18 +70,24 @@
 <!-- Script para controlar submenus no mobile -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    $(document).ready(function() {
-        // Abre e fecha o submenu ao clicar no item de menu no mobile
-        $('.dropdown-submenu > a').on("click", function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            $(this).next('.dropdown-menu').slideToggle();
-        });
+$(document).ready(function() {
+    // Controla o clique no item do submenu para abrir corretamente
+    $('.dropdown-submenu > a').on("click", function(e) {
+        e.preventDefault();
+        e.stopPropagation();
 
-        // Fecha qualquer submenu ao clicar em outro item fora do submenu
-        $('.dropdown').on("hide.bs.dropdown", function() {
-            $('.dropdown-menu .dropdown-menu').hide();
-        });
+        // Fecha todos os outros submenus
+        $('.dropdown-submenu .dropdown-menu').not($(this).next('.dropdown-menu')).slideUp().removeClass('show');
+
+        // Alterna a exibição do submenu atual e aplica a classe 'show'
+        $(this).next('.dropdown-menu').slideToggle().toggleClass('show');
     });
+
+    // Fecha o submenu quando o dropdown principal é fechado
+    $('.dropdown').on("hide.bs.dropdown", function() {
+        $('.dropdown-menu .dropdown-menu').slideUp().removeClass('show');
+    });
+});
+
 </script>
 
