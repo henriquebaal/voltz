@@ -276,41 +276,53 @@
 
     // Função para confirmar o pedido e enviar o formulário de pagamento via Axios
     function confirmOrder() {
-        const paymentMethod = document.getElementById('paymentMethod').value;
+    const paymentMethod = document.getElementById('paymentMethod').value;
+    const address = document.getElementById('address').textContent;
+    const phone = document.getElementById('phone').textContent;
 
-        if (!paymentMethod) {
-            alert('Por favor, selecione um método de pagamento.');
-            return;
-        }
-
-        // Pegar o valor do total de forma correta do campo oculto
-        const total = document.querySelector('input[name="total"]').value;
-
-        // Realiza a requisição com axios para processar o pedido
-        axios.post('{{ route("orders.store") }}', {
-            total: total,
-            paymentMethod: paymentMethod,
-            _token: '{{ csrf_token() }}'  // Passar o token CSRF para segurança
-        })
-        .then(response => {
-            // Redireciona para a página de resumo se o pedido for bem-sucedido
-            window.location.href = response.data.redirect_url;
-        })
-        .catch(error => {
-            if (error.response) {
-                // Exibe a mensagem de erro se houver falta de estoque ou outro problema
-                document.getElementById('errorMessage').innerHTML = `
-                    <div class="alert alert-danger">${error.response.data.message}</div>
-                `;
-            } else {
-                // Exibe um erro genérico se a requisição falhar
-                document.getElementById('errorMessage').innerHTML = `
-                    <div class="alert alert-danger">Ocorreu um erro ao processar seu pedido. Tente novamente.</div>
-                `;
-            }
-        });
-        
+    if (!address || address === 'Endereço não informado') {
+        alert('Por favor, preencha o endereço de entrega antes de confirmar o pedido.');
+        return;
     }
+
+    if (!phone || phone === 'Telefone não informado') {
+        alert('Por favor, preencha o número de telefone antes de confirmar o pedido.');
+        return;
+    }
+
+    if (!paymentMethod) {
+        alert('Por favor, selecione um método de pagamento.');
+        return;
+    }
+
+    // Pegar o valor do total de forma correta do campo oculto
+    const total = document.querySelector('input[name="total"]').value;
+
+    // Realiza a requisição com axios para processar o pedido
+    axios.post('{{ route("orders.store") }}', {
+        total: total,
+        paymentMethod: paymentMethod,
+        _token: '{{ csrf_token() }}'  // Passar o token CSRF para segurança
+    })
+    .then(response => {
+        // Redireciona para a página de resumo se o pedido for bem-sucedido
+        window.location.href = response.data.redirect_url;
+    })
+    .catch(error => {
+        if (error.response) {
+            // Exibe a mensagem de erro se houver falta de estoque ou outro problema
+            document.getElementById('errorMessage').innerHTML = `
+                <div class="alert alert-danger">${error.response.data.message}</div>
+            `;
+        } else {
+            // Exibe um erro genérico se a requisição falhar
+            document.getElementById('errorMessage').innerHTML = `
+                <div class="alert alert-danger">Ocorreu um erro ao processar seu pedido. Tente novamente.</div>
+            `;
+        }
+    });
+}
+
     function applyCoupon() {
         const couponCode = document.querySelector('input[name="coupon_code"]').value.trim();
 

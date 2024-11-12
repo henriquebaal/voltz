@@ -69,6 +69,18 @@ class OrderController extends Controller
     // Cria um pedido a partir do carrinho e redireciona para o resumo
     public function store(Request $request)
     {
+        $user = Auth::user();
+
+        // Verifica se o endereço do usuário está preenchido
+        if (empty($user->address)) {
+            return response()->json(['message' => 'Por favor, preencha o endereço de entrega antes de confirmar o pedido.'], 400);
+        }
+
+        // Verifica se o número do usuário está preenchido
+        if (empty($user->phone)) {
+            return response()->json(['message' => 'Por favor, preencha o número de telefone antes de confirmar o pedido.'], 400);
+        }
+
         $total = $request->input('total');
         
         // Calcula o total se ele não foi enviado
