@@ -84,11 +84,21 @@
 <!-- Axios Script -->
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
-    function openIngredientModal(productId) {
-        // Abrir a modal e passar o ID do produto para o campo oculto
-        document.getElementById('product_id').value = productId;
-        $('#ingredientModal').modal('show');
-    }
+function openIngredientModal(productId) {
+    // Resetar todos os checkboxes de atributos
+    const checkboxes = document.querySelectorAll('#ingredientForm .form-check-input');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = false; // Desmarca todos os checkboxes
+    });
+
+    // Resetar a quantidade para 1
+    document.getElementById('quantity').value = 1;
+
+    // Passar o ID do produto para o campo oculto e abrir a modal
+    document.getElementById('product_id').value = productId;
+    $('#ingredientModal').modal('show');
+}
+
 
     document.getElementById('addToCartButton').addEventListener('click', function () {
     // Obter os dados do formulário
