@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Coupon;
+use App\Models\LoyaltyPoint;
 
 class UserController extends Controller
 {
@@ -132,11 +133,12 @@ class UserController extends Controller
     {
         $user = Auth::user();
     
+        // Verifique se o usuário tem pontos suficientes
         if ($user->totalLoyaltyPoints() >= 100) {
             // Gera um código de cupom aleatório que começa com "50OFF"
             $randomCode = '50OFF' . strtoupper(substr(bin2hex(random_bytes(3)), 0, 6));
     
-            // Cria o cupom e define como único (is_unique = true)
+            // Cria o cupom e define como único
             $coupon = Coupon::create([
                 'code' => $randomCode,
                 'discount' => 50,
@@ -145,6 +147,14 @@ class UserController extends Controller
                 'is_unique' => true,  // Define o cupom como único
             ]);
     
+        // Deduz 100 pontos do usuário, adicionando um registro negativo
+        \DB::table('loyalty_points')->insert([
+            'user_id' => $user->id,
+            'points' => -100,
+            'order_id' => null, // Defina um valor se necessário
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
             // Retorna o código do cupom gerado na resposta
             return response()->json([
                 'message' => 'Cupom de 50% resgatado com sucesso!',

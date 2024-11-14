@@ -170,23 +170,31 @@
                 document.getElementById('successMessage').classList.add('d-none');
             });
     }
-
     function redeemCoupon() {
-        axios.post("{{ route('account.redeemLoyaltyCoupon') }}", {
-            _token: '{{ csrf_token() }}'
-        })
-        .then(response => {
-            document.getElementById('couponCode').textContent = response.data.coupon_code;
-            $('#couponModal').modal('show'); // Exibir a modal com o cupom
-        })
-        .catch(error => {
-            const errorMessage = error.response && error.response.data.error
-                ? error.response.data.error
-                : 'Ocorreu um erro ao resgatar o cupom.';
-            document.getElementById('errorMessage').innerHTML = errorMessage;
-            document.getElementById('errorMessage').classList.remove('d-none');
-            document.getElementById('successMessage').classList.add('d-none');
-        });
-    }
+    axios.post("{{ route('account.redeemLoyaltyCoupon') }}", {
+        _token: '{{ csrf_token() }}'
+    })
+    .then(response => {
+        document.getElementById('couponCode').textContent = response.data.coupon_code;
+        $('#couponModal').modal('show'); // Exibe o modal com o cupom
+    })
+    .catch(error => {
+        const errorMessage = error.response && error.response.data.error
+            ? error.response.data.error
+            : 'Ocorreu um erro ao resgatar o cupom.';
+        document.getElementById('errorMessage').innerHTML = errorMessage;
+        document.getElementById('errorMessage').classList.remove('d-none');
+        document.getElementById('successMessage').classList.add('d-none');
+    });
+}
+
+// Adiciona um evento para recarregar a página quando o modal é fechado
+$(document).ready(function() {
+    $('#couponModal').on('hidden.bs.modal', function () {
+        location.reload();
+    });
+});
+
+
 </script>
 @endsection
